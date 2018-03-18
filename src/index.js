@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import Toggle, { ToggleWithContext, withToggle } from './toggle';
+import Toggle, { Switch, ToggleRenderProps, ToggleWithContext, withToggle } from './toggle';
 
 import './styles.css';
 import { TOGGLE_CONTEXT_KEY } from "./toggle/withToggle";
@@ -108,10 +108,18 @@ class App extends Component {
     )
   }
 
+  _renderToggleRenderProps = () => (
+    <article>
+      <h2>Toggle using Render Props pattern</h2>
+      <ToggleRenderProps render={({ on, toggle }) => <Switch on={on} onClick={toggle} />}/>
+    </article>
+  )
+
   state = {
     showSimpleToggle: false,
     showToggleWithContext: false,
-    showToggleHOC: true
+    showToggleHOC: false,
+    showToggleRenderProps: true
   }
 
   _handleSimpleToggleOnChange = () => {
@@ -132,8 +140,14 @@ class App extends Component {
     }));
   }
 
+  _handleToggleRenderPropsOnChange = () => {
+    this.setState(({ showToggleRenderProps }) => ({
+      showToggleRenderProps: !showToggleRenderProps
+    }));
+  }
+
   _renderHeader = () => {
-    const { showSimpleToggle, showToggleWithContext, showToggleHOC } = this.state;
+    const { showSimpleToggle, showToggleRenderProps, showToggleWithContext, showToggleHOC } = this.state;
 
     return (
       <div className="header">
@@ -147,14 +161,18 @@ class App extends Component {
         </div>
         <div>
           <input type="checkbox" onChange={this._handleToggleHOCOnChange} checked={showToggleHOC}/>
-          Show Toggle HoC
+          Show Toggle using HoC
+        </div>
+        <div>
+          <input type="checkbox" onChange={this._handleToggleRenderPropsOnChange} checked={showToggleRenderProps}/>
+          Show Toggle using Render Props
         </div>
       </div>
     )
   }
 
   render() {
-    const { showSimpleToggle, showToggleWithContext, showToggleHOC } = this.state;
+    const { showSimpleToggle, showToggleWithContext, showToggleHOC, showToggleRenderProps } = this.state;
 
     return (
       <section className="container">
@@ -162,6 +180,7 @@ class App extends Component {
         {showSimpleToggle && this._renderToggle()}
         {showToggleWithContext && this._renderToggleWithContext()}
         {showToggleHOC && this._renderToggleHOC()}
+        {showToggleRenderProps && this._renderToggleRenderProps()}
       </section>
     )
   }
