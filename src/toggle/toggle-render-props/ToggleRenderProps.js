@@ -36,7 +36,11 @@ export default class ToggleRenderProps extends React.Component {
   render() {
     return this.props.render({
       on: this.state.on,
-      toggle: this.toggle
+      toggle: this.toggle,
+      togglerProps: { // togglerProps Collection
+        onClick: this.toggle,
+        'aria-expanded': this.state.on
+      }
     });
   }
 }

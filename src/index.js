@@ -1,14 +1,38 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import Toggle, { Switch, ToggleRenderProps, ToggleWithContext, withToggle } from './toggle';
+import Toggle, { ToggleWithContext, ToggleRenderProps, withToggle } from './toggle';
 
 import './styles.css';
 import { TOGGLE_CONTEXT_KEY } from "./toggle/withToggle";
 
 class App extends Component {
+
+  static SHOW_SIMPLE_TOGGLE_PROP = 'showSimpleToggle';
+  static SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP = 'showToggleWithContext';
+  static SHOW_SIMPLE_TOGGLE_HOC_PROP = 'showToggleHOC';
+  static SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP = 'showToggleRenderProps';
+
+  state = {
+    [App.SHOW_SIMPLE_TOGGLE_PROP]: false,
+    [App.SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP]: false,
+    [App.SHOW_SIMPLE_TOGGLE_HOC_PROP]: false,
+    [App.SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP]: true
+  }
+
   componentDidCatch(err) {
     console.log('ERROR CAUGHT:', err.message);
   }
+
+  _handleOnChange = (prop) => () => {
+    this.setState((props) => ({
+      [prop]: !props[prop]
+    }));
+  }
+
+  _handleSimpleToggleOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_PROP);
+  _handleToggleWithContextOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP);
+  _handleToggleHOCOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_HOC_PROP);
+  _handleToggleRenderPropsOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP);
 
   _renderToggle = () => (
     <article>
@@ -49,9 +73,8 @@ class App extends Component {
   )
 
   _renderToggleHOC() {
-
     const CustomSwitch = (props) => {
-      const { on, toggle } = props[TOGGLE_CONTEXT_KEY];
+      const { on, toggle } = props[ TOGGLE_CONTEXT_KEY ];
       return <button onClick={toggle}>{on ? 'ON' : 'OFF'}</button>;
     }
     const EnhancedCustomSwitch = withToggle(CustomSwitch);
@@ -62,7 +85,7 @@ class App extends Component {
     // overrides the context on.
     const MyEventComponent = (props) => {
       const { event, on } = props;
-      const toggleProps = props[TOGGLE_CONTEXT_KEY];
+      const toggleProps = props[ TOGGLE_CONTEXT_KEY ];
 
       const buttonProps = { [ event ]: on };
 
@@ -83,7 +106,7 @@ class App extends Component {
       static ToggleMessage = withToggle(MySwitchClassMessage);
 
       render() {
-        const { on, toggle } = this.props[TOGGLE_CONTEXT_KEY];
+        const { on, toggle } = this.props[ TOGGLE_CONTEXT_KEY ];
         return <button onClick={toggle}>{on ? 'ON' : 'OFF'}</button>;
       }
     }
@@ -101,50 +124,14 @@ class App extends Component {
           <ToggleWithContext.Switch/>
           <EnhancedCustomSwitch/>
           <EnhancedMyEventComponent event="onClick" on={(evt) => console.log(evt.type)}/>
-          <EnhancedMySwitchClass />
-          <EnhancedMySwitchClass.ToggleMessage />
+          <EnhancedMySwitchClass/>
+          <EnhancedMySwitchClass.ToggleMessage/>
         </ToggleWithContext>
       </article>
     )
   }
 
-  _renderToggleRenderProps = () => (
-    <article>
-      <h2>Toggle using Render Props pattern</h2>
-      <ToggleRenderProps render={({ on, toggle }) => <Switch on={on} onClick={toggle} />}/>
-    </article>
-  )
-
-  state = {
-    showSimpleToggle: false,
-    showToggleWithContext: false,
-    showToggleHOC: false,
-    showToggleRenderProps: true
-  }
-
-  _handleSimpleToggleOnChange = () => {
-    this.setState(({ showSimpleToggle }) => ({
-      showSimpleToggle: !showSimpleToggle
-    }));
-  }
-
-  _handleToggleWithContextOnChange = () => {
-    this.setState(({ showToggleWithContext }) => ({
-      showToggleWithContext: !showToggleWithContext
-    }));
-  }
-
-  _handleToggleHOCOnChange = () => {
-    this.setState(({ showToggleHOC }) => ({
-      showToggleHOC: !showToggleHOC
-    }));
-  }
-
-  _handleToggleRenderPropsOnChange = () => {
-    this.setState(({ showToggleRenderProps }) => ({
-      showToggleRenderProps: !showToggleRenderProps
-    }));
-  }
+  _renderToggleRenderProps = () => <ToggleRenderProps />
 
   _renderHeader = () => {
     const { showSimpleToggle, showToggleRenderProps, showToggleWithContext, showToggleHOC } = this.state;
