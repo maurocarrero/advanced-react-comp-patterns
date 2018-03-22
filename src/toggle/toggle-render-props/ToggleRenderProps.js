@@ -22,24 +22,38 @@ import React from 'react';
 //   is dynamic.
 
 export default class ToggleRenderProps extends React.Component {
-  state = {
-    on: true
-  };
+  static defaultProps = {
+    defaultOn: false,
+    onReset: () => console.log('Unspecified onReset'),
+    onToggle: () => console.log('Unspecified onToggle')
+  }
+
+  // STATE INITIALIZERS
+  // https://egghead.io/lessons/react-use-component-state-initializers
+  initialState = { on: this.props.defaultOn };
+  state = this.initialState;
 
   _toggle = () => {
     this.setState(({ on }) => ({
       on: !on
-    }))
+    }), this.props.onToggle);
   }
+
+  _reset = () => {
+    this.setState(() => ({
+      on: this.initialState.defaultOn
+    }), () => this.props.onReset())
+  }
+
+  _callOnArgs = (...fns) => (...args) => fns.forEach(fn => fn && fn(...args));
 
   // PROP GETTERS WITH RENDER PROPS
   // https://egghead.io/lessons/react-use-prop-getters-with-render-props
 
   _getTogglerProps = ({ onClick, ...props } = {}) => {
     // togglerProps Collection
-    const callOnArgs = (...fns) => (...args) => fns.forEach(fn => fn && fn(...args));
     return {
-      onClick: callOnArgs(onClick, this._toggle), // run both
+      onClick: this._callOnArgs(onClick, this._toggle), // run both
       'aria-expanded': this.state.on,
       ...props
     };
@@ -49,6 +63,7 @@ export default class ToggleRenderProps extends React.Component {
     return this.props.render({
       on: this.state.on,
       toggle: this._toggle,
+      reset: this._reset,
       getTogglerProps: this._getTogglerProps
     });
   }
