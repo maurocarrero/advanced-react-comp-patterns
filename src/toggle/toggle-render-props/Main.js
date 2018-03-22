@@ -2,25 +2,22 @@ import React, { Fragment } from 'react';
 import ToggleRenderProps from './ToggleRenderProps';
 import Switch from '../Switch';
 
-// https://egghead.io/lessons/react-use-prop-getters-with-render-props
-
 const Main = () => {
-  const render = ({ on, togglerProps }) => (
+  const render = ({ on, getTogglerProps }) => (
     <Fragment>
-      <Switch on={on} {...togglerProps}/>
-      <button
-        onClick={(evt) => {
-          // We implement our click
-          console.log('CLICKED!');
-          // and call the onClick from the togglerProps
-          // A way of fixing the problem of overwriting onClick function,
-          // the problem now is that we must expose implementation details,
-          // if onClick changes to onKeyDown we must change accordingly,
-          // it is a leak abstraction.
-          togglerProps.onClick(evt);
-        }}>
-        {on ? 'Turn OFF' : 'Turn ON'}
-      </button>
+      <Switch on={on} {...getTogglerProps()}/>
+      <hr/>
+      <input type="text" {...getTogglerProps({
+        onClick: (evt) => evt.target.style.backgroundColor = on ? 'red' : 'lightgreen',
+        onChange: () => console.log('onChange'),
+        onBlur: () => console.log('onBlur')
+      })}/>
+      {/*// PROP GETTERS WITH RENDER PROPS*/}
+      {/*// https://egghead.io/lessons/react-use-prop-getters-with-render-props*/}
+      <button {...getTogglerProps({
+        onClick: () => console.log('onClick'),
+        onChange: () => console.log('onChange')
+      })}>{on ? 'Turn OFF' : 'Turn ON'}</button>
     </Fragment>
   );
 

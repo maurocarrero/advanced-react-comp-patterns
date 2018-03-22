@@ -1,5 +1,6 @@
 import React from 'react';
 
+// RENDER PROPS
 // https://egghead.io/lessons/react-use-render-props-with-react
 
 // HoC vs Render Props
@@ -20,27 +21,35 @@ import React from 'react';
 //   we can take advantage of lifecycle methods and natural flow of props and state because the composition model
 //   is dynamic.
 
-
-
 export default class ToggleRenderProps extends React.Component {
   state = {
     on: true
   };
 
-  toggle = () => {
+  _toggle = () => {
     this.setState(({ on }) => ({
       on: !on
     }))
   }
 
+  // PROP GETTERS WITH RENDER PROPS
+  // https://egghead.io/lessons/react-use-prop-getters-with-render-props
+
+  _getTogglerProps = ({ onClick, ...props } = {}) => {
+    // togglerProps Collection
+    const callOnArgs = (...fns) => (...args) => fns.forEach(fn => fn && fn(...args));
+    return {
+      onClick: callOnArgs(onClick, this._toggle), // run both
+      'aria-expanded': this.state.on,
+      ...props
+    };
+  }
+
   render() {
     return this.props.render({
       on: this.state.on,
-      toggle: this.toggle,
-      togglerProps: { // togglerProps Collection
-        onClick: this.toggle,
-        'aria-expanded': this.state.on
-      }
+      toggle: this._toggle,
+      getTogglerProps: this._getTogglerProps
     });
   }
 }
