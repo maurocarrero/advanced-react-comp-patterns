@@ -1,9 +1,8 @@
 {
-  "name": "new",
+  "name": "advanced-react-component-patterns",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "homepage": "https://codesandbox.io/s/new",
   "main": "src/index.js",
   "dependencies": {
     "hoist-non-react-statics": "^2.5.0",
