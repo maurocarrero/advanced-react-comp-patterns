@@ -33,16 +33,26 @@ export default class ToggleRenderProps extends React.Component {
   initialState = { on: this.props.defaultOn };
   state = this.initialState;
 
+  _isNotControlled = () => this.props.on === undefined;
+
   _toggle = () => {
-    this.setState(({ on }) => ({
-      on: !on
-    }), this.props.onToggle);
+    if (this._isNotControlled()) {
+      this.setState(({ on }) => ({
+        on: !on
+      }), this.props.onToggle);
+    } else {
+      this.props.onToggle();
+    }
   }
 
   _reset = () => {
-    this.setState(() => ({
-      on: this.initialState.defaultOn
-    }), () => this.props.onReset())
+    if (this._isNotControlled()) {
+      this.setState(() => ({
+        on: this.initialState.defaultOn
+      }), this.props.onReset);
+    } else {
+      this.props.onReset();
+    }
   }
 
   _callOnArgs = (...fns) => (...args) => fns.forEach(fn => fn && fn(...args));
@@ -61,7 +71,7 @@ export default class ToggleRenderProps extends React.Component {
 
   render() {
     return this.props.render({
-      on: this.state.on,
+      on: this._isNotControlled() ? this.state.on : this.props.on,
       toggle: this._toggle,
       reset: this._reset,
       getTogglerProps: this._getTogglerProps
