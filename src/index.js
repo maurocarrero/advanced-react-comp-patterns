@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import Toggle, { ToggleWithContext, ToggleRenderProps, withToggle } from './toggle';
+import Toggle, { ToggleContextProvider, ToggleRenderProps, ToggleWithContext, withToggle } from './toggle';
 
 import './styles.css';
 import { TOGGLE_CONTEXT_KEY } from "./toggle/withToggle";
@@ -8,15 +8,17 @@ import { TOGGLE_CONTEXT_KEY } from "./toggle/withToggle";
 class App extends Component {
 
   static SHOW_SIMPLE_TOGGLE_PROP = 'showSimpleToggle';
-  static SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP = 'showToggleWithContext';
-  static SHOW_SIMPLE_TOGGLE_HOC_PROP = 'showToggleHOC';
-  static SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP = 'showToggleRenderProps';
+  static SHOW_TOGGLE_WITH_CONTEXT_PROP = 'showToggleWithContext';
+  static SHOW_TOGGLE_HOC_PROP = 'showToggleHOC';
+  static SHOW_TOGGLE_RENDER_PROPS_PROP = 'showToggleRenderProps';
+  static SHOW_TOGGLE_CONTEXT_PROVIDER = 'showToggleContextProvider';
 
   state = {
-    [App.SHOW_SIMPLE_TOGGLE_PROP]: false,
-    [App.SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP]: false,
-    [App.SHOW_SIMPLE_TOGGLE_HOC_PROP]: false,
-    [App.SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP]: true
+    [ App.SHOW_SIMPLE_TOGGLE_PROP ]: false,
+    [ App.SHOW_TOGGLE_WITH_CONTEXT_PROP ]: false,
+    [ App.SHOW_TOGGLE_HOC_PROP ]: false,
+    [ App.SHOW_TOGGLE_RENDER_PROPS_PROP ]: false,
+    [ App.SHOW_TOGGLE_CONTEXT_PROVIDER ]: true,
   }
 
   componentDidCatch(err) {
@@ -25,14 +27,15 @@ class App extends Component {
 
   _handleOnChange = (prop) => () => {
     this.setState((props) => ({
-      [prop]: !props[prop]
+      [ prop ]: !props[ prop ]
     }));
   }
 
   _handleSimpleToggleOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_PROP);
-  _handleToggleWithContextOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_WITH_CONTEXT_PROP);
-  _handleToggleHOCOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_HOC_PROP);
-  _handleToggleRenderPropsOnChange = this._handleOnChange(App.SHOW_SIMPLE_TOGGLE_RENDER_PROPS_PROP);
+  _handleToggleWithContextOnChange = this._handleOnChange(App.SHOW_TOGGLE_WITH_CONTEXT_PROP);
+  _handleToggleHOCOnChange = this._handleOnChange(App.SHOW_TOGGLE_HOC_PROP);
+  _handleToggleRenderPropsOnChange = this._handleOnChange(App.SHOW_TOGGLE_RENDER_PROPS_PROP);
+  _handleToggleContextProviderOnChange = this._handleOnChange(App.SHOW_TOGGLE_CONTEXT_PROVIDER);
 
   _renderToggle = () => (
     <article>
@@ -111,7 +114,6 @@ class App extends Component {
       }
     }
 
-
     const EnhancedMySwitchClass = withToggle(MySwitchClass);
 
     return (
@@ -129,45 +131,78 @@ class App extends Component {
         </ToggleWithContext>
       </article>
     )
-  }
+  };
 
-  _renderToggleRenderProps = () => <ToggleRenderProps />
+  _renderToggleRenderProps = () => <ToggleRenderProps/>;
 
-  _renderHeader = () => {
-    const { showSimpleToggle, showToggleRenderProps, showToggleWithContext, showToggleHOC } = this.state;
+  _renderToggleContextProvider = () => <ToggleContextProvider/>;
+
+  _renderOptions = () => {
+    const {
+      showSimpleToggle, showToggleContextProvider, showToggleHOC, showToggleRenderProps, showToggleWithContext
+    } = this.state;
+
+    const simpleToggleProps = {
+      checked: showSimpleToggle,
+      label: 'Show simple Toggle',
+      onChange: this._handleSimpleToggleOnChange
+    };
+
+    const toggleWithContext = {
+      checked: showToggleWithContext,
+      label: 'Show Toggle with Context',
+      onChange: this._handleToggleWithContextOnChange
+    };
+
+    const toggleHOC = {
+      checked: showToggleHOC,
+      label: 'Show Toggle with HOC',
+      onChange: this._handleToggleHOCOnChange
+    };
+
+    const toggleRenderProps = {
+      checked: showToggleRenderProps,
+      label: 'Show Toggle with Render Props',
+      onChange: this._handleToggleRenderPropsOnChange
+    };
+
+    const toggleContextProvider = {
+      checked: showToggleContextProvider,
+      label: 'Show Toggle with Context Provider',
+      onChange: this._handleToggleContextProviderOnChange
+    };
+
+    const checkboxesProps = [
+      simpleToggleProps,
+      toggleWithContext,
+      toggleHOC,
+      toggleRenderProps,
+      toggleContextProvider
+    ];
 
     return (
-      <div className="header">
-        <div>
-          <input type="checkbox" onChange={this._handleSimpleToggleOnChange} checked={showSimpleToggle}/>Show simple
-          Toggle
-        </div>
-        <div>
-          <input type="checkbox" onChange={this._handleToggleWithContextOnChange} checked={showToggleWithContext}/>
-          Show Toggle with Context
-        </div>
-        <div>
-          <input type="checkbox" onChange={this._handleToggleHOCOnChange} checked={showToggleHOC}/>
-          Show Toggle using HoC
-        </div>
-        <div>
-          <input type="checkbox" onChange={this._handleToggleRenderPropsOnChange} checked={showToggleRenderProps}/>
-          Show Toggle using Render Props
-        </div>
-      </div>
+      <header className="header">
+        <ul>
+          {this._renderCheckboxes(checkboxesProps)}
+        </ul>
+      </header>
     )
   }
 
+  _renderCheckboxes = (props) =>
+    props.map(({ label, ...rest }) => <li key={label}><input type="checkbox" {...rest}/>{label}</li>)
+
   render() {
-    const { showSimpleToggle, showToggleWithContext, showToggleHOC, showToggleRenderProps } = this.state;
+    const { showToggleContextProvider, showSimpleToggle, showToggleWithContext, showToggleHOC, showToggleRenderProps } = this.state;
 
     return (
       <section className="container">
-        {this._renderHeader()}
+        {this._renderOptions()}
         {showSimpleToggle && this._renderToggle()}
         {showToggleWithContext && this._renderToggleWithContext()}
         {showToggleHOC && this._renderToggleHOC()}
         {showToggleRenderProps && this._renderToggleRenderProps()}
+        {showToggleContextProvider && this._renderToggleContextProvider()}
       </section>
     )
   }

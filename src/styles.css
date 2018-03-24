@@ -28,6 +28,10 @@ hr {
   left: 0;
 }
 
+.header ul {
+  list-style-type: none;
+}
+
 /*
 toggle styles copied and modified from
 https://codepen.io/mallendeo/pen/eLIiG
